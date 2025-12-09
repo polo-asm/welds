@@ -82,9 +82,24 @@ fn from_expr_method(expr_method: &ExprMethodCall, param_name: &str,schema_type: 
     let method_name = &expr_method.method;
 
     Ok(match method_name.to_string().as_str() {
-        "is_some" => quote! { welds::query::clause::ConditionInfo::unary( welds::query::clause::UnaryOperator::IsSome, #receiver) },
-        "is_none" => quote! { welds::query::clause::ConditionInfo::unary( welds::query::clause::UnaryOperator::IsNone, #receiver) },
-        _ => Err(format!("Unsupported method: {:?}", quote!(#method_name)))?,
+        "is_some" => {
+            if expr_method.args.len() != 0 {
+                return Err(format!("Method 'contains' expects no argument, found {}", expr_method.args.len()));
+            }
+            quote! { welds::query::clause::ConditionInfo::unary( welds::query::clause::UnaryOperator::IsSome, #receiver) }},
+        "is_none" => {
+            if expr_method.args.len() != 0 {
+                return Err(format!("Method 'contains' expects no argument, found {}", expr_method.args.len()));
+            }
+            quote! { welds::query::clause::ConditionInfo::unary( welds::query::clause::UnaryOperator::IsNone, #receiver) }},
+        "contains" =>{
+            if expr_method.args.len() != 1 {
+                return Err(format!("Method 'contains' expects exactly one argument, found {}", expr_method.args.len()));
+            }
+            let arg = from_expr(&expr_method.args[0], param_name, schema_type)?;
+            quote! { welds::query::clause::ConditionInfo::binary( #receiver, welds::query::clause::BinaryOperator::Like, format!("'%{}%'",#arg)) }
+        },
+        _ => quote!{#receiver.#method_name(format!("Unsupported method: {}", #expr_method)) },
     })
 }
 

@@ -189,23 +189,24 @@ use welds_macros::WeldsModel;
 
         assert_eq!(clause, "t1.is_active = $1");
     }
-/*
+
     #[test]
     fn test_contains_condition_macro(){
         let mut args: ParamArgs = Vec::new();
         let next_params = NextParam::new(Syntax::Postgres);
 
         // Create condition using the macro
-        let condition = condition!(|a: TestModel| a.name. == true );
+        let condition_creator = condition!(|a: TestModel| a.name.contains("abc")  );
+        let condition = condition_creator(TestModelSchema::default());
 
         condition.bind(&mut args);
         assert_eq!(args.len(), 1);
-
+        
         // Test clause
         let clause = condition.clause(Syntax::Postgres, "t1", &next_params).unwrap();
 
-        assert_eq!(clause, "t1.is_active = $1");
-    }*/
+        assert_eq!(clause, "t1.name like $1");
+    }
 
     #[test]
     fn test_is_some_condition_macro(){
