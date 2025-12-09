@@ -9,6 +9,7 @@ pub(crate) mod hook;
 pub(crate) mod info;
 pub(crate) mod relation;
 pub(crate) mod utils;
+pub(crate) mod condition;
 
 use info::Info;
 
@@ -73,4 +74,21 @@ fn model_gen_inner(input: TokenStream) -> errors::Result<TokenStream> {
     // std::fs::write(filename, code);
 
     Ok(q.into())
+}
+
+#[proc_macro]
+pub fn condition(input: TokenStream) -> TokenStream {
+    match condition::do_condition(input.into()) {
+        Ok(condition) => {
+            let value= condition;
+
+            value.into()
+        }
+        Err(err) => {
+            let output = format!("Parsing error: {}", err);
+            quote! {
+                compile_error!(#output);
+            }.into()
+        }
+    }
 }

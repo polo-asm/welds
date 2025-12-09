@@ -32,6 +32,10 @@ pub use clause_adder::ClauseAdder;
 mod assignment_adder;
 pub use assignment_adder::AssignmentAdder;
 
+// condition types for WHERE clauses
+pub mod condition;
+pub use condition::{ConditionInfo, BinaryOperator, UnaryOperator};
+
 pub struct ClauseColVal<T> {
     pub null_clause: bool,
     pub not_clause: bool,

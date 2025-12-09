@@ -182,3 +182,4 @@ pub use welds_connections::{Client, Row, Syntax, TransactStart};
 
 /// Re-export the Macro used to make models
 pub use welds_macros::WeldsModel;
+pub use welds_macros::condition;
